@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,7 +18,7 @@ namespace MyBorads.Entities
         public string State { get; set; }
         public string Area { get; set; }
         public string IterationPath { get; set; }
-        public int Priority { get; set; }
+        public int Priority { get; set; } 
         //epic
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
@@ -30,5 +31,9 @@ namespace MyBorads.Entities
 
         public string Type { get; set; }
 
+        public List<Comment> Comments { get; set; } = new List<Comment>();
+
+        public User Author { get; set; }
+        public Guid AuthorId { get; set; }
     }
 }

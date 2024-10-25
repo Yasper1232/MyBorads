@@ -31,12 +31,26 @@ namespace MyBorads.Entities
                 eb.Property(wi => wi.EndDate).HasPrecision(3);
                 eb.Property(wi => wi.Activity).HasMaxLength(200);
                 eb.Property(wi => wi.RemaningWork).HasPrecision(14, 2);
+                eb.Property(wi => wi.Priority).HasDefaultValue(1);
+                eb.HasMany(w => w.Comments) //relacja 1:wielu gdzie workitem ma wiele komentarzy , a te komentarze maja jeden workitem
+                .WithOne(c => c.WorkItem)
+                .HasForeignKey(c =>c.WorkItemId);
             });
 
+            modelBuilder.Entity<Comment>(eb =>
+            {
+                eb.Property(x => x.CreatedDate).HasDefaultValueSql("getutcdate()");
+                eb.Property(x => x.UpdatedDate).ValueGeneratedOnUpdate();
+
+            });
+
+            modelBuilder.Entity<User>() //konfiguracja relacji 1:1 poprzez Entity
+            .HasOne(u => u.Adress)
+            .WithOne(a => a.User)
+            .HasForeignKey<Address>(a => a.UserId);
 
 
-                
-
+         
         }
 
 
