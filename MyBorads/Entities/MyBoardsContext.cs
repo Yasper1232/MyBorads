@@ -11,6 +11,11 @@ namespace MyBorads.Entities
         //teraz zdefiniujemy tabele ktore beda sie w bazie danych znajdowac
 
         public DbSet<WorkItem> WorkItems { get; set; }
+        public DbSet<Issue> Issues { get; set; }
+        public DbSet<Epic> Epics { get; set; }
+        public DbSet<Task> Tasks { get; set; }
+
+
         public DbSet<User> Users { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<Comment> Comments { get; set; }
@@ -19,8 +24,25 @@ namespace MyBorads.Entities
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<WorkItemState>(eb =>
+            {
+                eb.Property(s => s.Value).IsRequired();
+                eb.Property(s => s.Value).HasMaxLength(50);
+            });
 
-           
+            modelBuilder.Entity<Epic>()
+                .Property(wi => wi.EndDate)
+                .HasPrecision(3);
+
+            modelBuilder.Entity<Task>(ta => {
+                ta.Property(wi => wi.Activity).HasMaxLength(200);
+                ta.Property(wi => wi.RemaningWork).HasPrecision(14, 2);
+                });
+
+            modelBuilder.Entity<Issue>().Property(x => x.Efford).HasColumnType("decimal(5,2)");
+
+
+
 
             modelBuilder.Entity<WorkItem>(eb =>
             {
@@ -31,10 +53,10 @@ namespace MyBorads.Entities
 
                 eb.Property(wi => wi.Area).HasColumnType("varchar(200)");
                 eb.Property(x => x.IterationPath).HasColumnName("Iteration_Path");
-                eb.Property(x => x.Efford).HasColumnType("decimal(5,2)");
-                eb.Property(wi => wi.EndDate).HasPrecision(3);
-                eb.Property(wi => wi.Activity).HasMaxLength(200);
-                eb.Property(wi => wi.RemaningWork).HasPrecision(14, 2);
+                
+               
+                
+                
                 eb.Property(wi => wi.Priority).HasDefaultValue(1);
                 eb.HasMany(w => w.Comments) //relacja 1:wielu gdzie workitem ma wiele komentarzy , a te komentarze maja jeden workitem
                 .WithOne(c => c.WorkItem)
