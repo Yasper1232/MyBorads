@@ -18,5 +18,16 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+//jesli nie ma bazy danych lub sa zalegle migracje to taka baza zostanie utworzona tym kodem :
+using var scope = app.Services.CreateScope();
+var dbContext = scope.ServiceProvider.GetService<DbContext>();
+
+var pendingMigrations = dbContext.Database.GetPendingMigrations();
+
+if (pendingMigrations.Any())
+{
+    dbContext.Database.Migrate();
+}
+
 app.Run();
 
