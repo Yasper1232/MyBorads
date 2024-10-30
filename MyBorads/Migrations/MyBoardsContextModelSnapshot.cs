@@ -48,7 +48,7 @@ namespace MyBorads.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Addresses");
+                    b.ToTable("Addresses", (string)null);
                 });
 
             modelBuilder.Entity("MyBorads.Entities.Comment", b =>
@@ -81,7 +81,7 @@ namespace MyBorads.Migrations
 
                     b.HasIndex("WorkItemId");
 
-                    b.ToTable("Comments");
+                    b.ToTable("Comments", (string)null);
                 });
 
             modelBuilder.Entity("MyBorads.Entities.Tag", b =>
@@ -97,7 +97,7 @@ namespace MyBorads.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Tags");
+                    b.ToTable("Tags", (string)null);
                 });
 
             modelBuilder.Entity("MyBorads.Entities.User", b =>
@@ -114,7 +114,7 @@ namespace MyBorads.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("MyBorads.Entities.WorkItem", b =>
@@ -154,7 +154,7 @@ namespace MyBorads.Migrations
 
                     b.HasIndex("StateId");
 
-                    b.ToTable("WorkItems");
+                    b.ToTable("WorkItems", (string)null);
 
                     b.HasDiscriminator().HasValue("WorkItem");
 
@@ -176,7 +176,7 @@ namespace MyBorads.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("WorkItemsStates");
+                    b.ToTable("WorkItemsStates", (string)null);
                 });
 
             modelBuilder.Entity("MyBorads.Entities.WorkItemTag", b =>
@@ -199,7 +199,7 @@ namespace MyBorads.Migrations
 
                     b.HasIndex("WorkItemId");
 
-                    b.ToTable("WorkItemTag");
+                    b.ToTable("WorkItemTag", (string)null);
                 });
 
             modelBuilder.Entity("MyBorads.Entities.Epic", b =>

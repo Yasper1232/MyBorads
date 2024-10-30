@@ -29,5 +29,7 @@ if (pendingMigrations.Any())
     dbContext.Database.Migrate();
 }
 
+//Metoda GetPendingMigrations() jest czêœci¹ API migracji Entity Framework Core. S³u¿y do uzyskania listy migracji, //które zosta³y utworzone, ale jeszcze nie zosta³y zastosowane w bazie danych.
+
 app.Run();
 
