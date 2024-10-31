@@ -5,7 +5,8 @@
         public int Id { get; set; } //klucz glowny
 
         public string Message { get; set; }
-        public string Author { get; set; }
+        public User Author { get; set; }
+        public Guid AuthorId { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
 
