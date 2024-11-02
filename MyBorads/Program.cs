@@ -1,11 +1,20 @@
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using MyBorads.Entities;
+using System.Diagnostics.Metrics;
+using System.IO;
+using System.Net;
+using System.Text.Json.Serialization;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.Configure<JsonOptions>(options =>
+{
+    options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+});
 
 builder.Services.AddDbContext<MyBoardsContext>(
     option => option.UseSqlServer(builder.Configuration.GetConnectionString("MyBoardsConnectionString"))
@@ -37,7 +46,7 @@ if (!users.Any())
     {
         Email = "user1@test.com",
         FullName = "User one",
-        Adress = new Address()
+        Address = new Address()
         {
             City = "Warszawa",
             Street = "Szeroka"
@@ -47,7 +56,7 @@ if (!users.Any())
     {
         Email = "user2@test.com",
         FullName = "User two",
-        Adress = new Address()
+        Address = new Address()
         {
             City = "Krakow",
             Street = "Dluga"
@@ -58,6 +67,58 @@ if (!users.Any())
 }
 
 //Metoda GetPendingMigrations() jest czêœci¹ API migracji Entity Framework Core. S³u¿y do uzyskania listy migracji, //które zosta³y utworzone, ale jeszcze nie zosta³y zastosowane w bazie danych.
+
+app.MapGet("data",async (MyBoardsContext db) =>
+{
+    var user = await db.Users
+    .Include(u=>u.Comments)
+    .ThenInclude(c=>c.WorkItem)
+    .Include(u=>u.Address)
+    
+    .FirstAsync(u => u.Id == Guid.Parse("68366DBE-0809-490F-CC1D-08DA10AB0E61"));
+   
+    
+    //var userComments =await db.Comments.Where(c=>c.AuthorId == user.Id).ToListAsync();
+
+    return user;
+});
+
+app.MapPost("update", async (MyBoardsContext db) =>
+{
+    Epic epic = await db.Epics.FirstAsync(epic => epic.Id == 1);
+
+    var rejectedState = await db.WorkItemsStates.FirstAsync(a => a.Value == "Rejected");
+
+    epic.State = rejectedState;
+
+   await db.SaveChangesAsync();
+
+    return epic;
+
+});
+
+app.MapPost("create", async (MyBoardsContext db) =>
+{
+    var address = new Address()
+    {   
+        Id = Guid.Parse("2069cd89-e101-47e3-92e0-de1ac3d35328"),
+        City = "Kraków",
+        Country = "Poland",
+        Street = "D³uga"
+
+    };
+
+    var user = new User()
+    {
+        Email = "user@test.com",
+        FullName = "Test User",
+        Address = address,
+    };
+
+    db.Users.Add(user);
+    await db.SaveChangesAsync();
+    return user;
+});
 
 app.Run();
 

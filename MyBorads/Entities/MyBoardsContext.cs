@@ -106,7 +106,7 @@ namespace MyBorads.Entities
             });
 
             modelBuilder.Entity<User>() //konfiguracja relacji 1:1 poprzez Entity
-            .HasOne(u => u.Adress)
+            .HasOne(u => u.Address)
             .WithOne(a => a.User)
             .HasForeignKey<Address>(a => a.UserId);
 
