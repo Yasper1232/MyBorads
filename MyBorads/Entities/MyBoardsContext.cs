@@ -15,6 +15,8 @@ namespace MyBorads.Entities
         public DbSet<Epic> Epics { get; set; }
         public DbSet<Task> Tasks { get; set; }
 
+        public DbSet<WorkItemTag> WorkItemTag { get; set; }
+
 
         public DbSet<User> Users { get; set; }
         public DbSet<Tag> Tags { get; set; }
@@ -101,7 +103,7 @@ namespace MyBorads.Entities
                 eb.HasOne(c => c.Author)
                 .WithMany(a => a.Comments)
                 .HasForeignKey(c => c.AuthorId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.ClientCascade);
                 
             });
 
