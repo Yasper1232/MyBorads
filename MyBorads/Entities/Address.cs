@@ -1,4 +1,6 @@
-﻿namespace MyBorads.Entities
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace MyBorads.Entities
 {
     public class Address
     {
@@ -11,5 +13,17 @@
 
         public User User { get; set; }
         public Guid UserId { get; set; }
+
+        public Coordinate Coordinate { get; set; }
+
     }
+
+   
+    public class Coordinate
+    {
+
+        public decimal Longitude { get; set; }
+        public decimal Latitude { get; set; }
+    }
+
 }
