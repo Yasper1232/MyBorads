@@ -7,7 +7,7 @@
         public string Value { get; set; }
       //  public string Category { get; set; }
 
-        public List<WorkItem> WorkItems { get; set; }
+        public virtual List<WorkItem> WorkItems { get; set; }
 
 
     }

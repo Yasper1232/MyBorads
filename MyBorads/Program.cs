@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using MyBorads.Entities;
@@ -17,7 +18,9 @@ builder.Services.Configure<JsonOptions>(options =>
 });
 
 builder.Services.AddDbContext<MyBoardsContext>(
-    option => option.UseSqlServer(builder.Configuration.GetConnectionString("MyBoardsConnectionString"))
+    option => option
+    .UseLazyLoadingProxies()
+    .UseSqlServer(builder.Configuration.GetConnectionString("MyBoardsConnectionString"))
     
     );
 
@@ -71,10 +74,21 @@ if (!users.Any())
 app.MapGet("data",async (MyBoardsContext db) =>
 {
 
-var topAuthors = db.ViewTopAuthors.ToList();
+    var withAddress = true;
 
-    return topAuthors;
+    var users = db.Users
     
+    .First(u => u.Id == Guid.Parse("78CF834E-7724-4995-CBC4-08DA10AB0E61"));
+
+    if (withAddress)
+    {
+        var result = new { Fullname = users.FullName, Address = $"{users.Address.Street} {users.Address.City}" };
+        return result;
+    }
+
+    return new {FullName = users.FullName, Address = "-"};
+
+
 });
 
 app.MapPost("update", async (MyBoardsContext db) =>

@@ -40,10 +40,10 @@ namespace MyBorads.Entities
         public int Priority { get; set; } 
 
 
-        public List<Comment> Comments { get; set; } = new List<Comment>();
-        public User Author { get; set; }
+        public virtual List<Comment> Comments { get; set; } = new List<Comment>();
+        public virtual User Author { get; set; }
         public Guid AuthorId { get; set; }
-        public List<Tag> Tags { get; set; }
+        public virtual List<Tag> Tags { get; set; }
         public WorkItemState State { get; set; } //odwolanie
         public int StateId { get; set; } //foreignkey
 
