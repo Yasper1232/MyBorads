@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
+using MyBorads.Dto;
 using MyBorads.Entities;
 using System.Diagnostics.Metrics;
 using System.IO;
+using System.Linq.Expressions;
 using System.Net;
 using System.Text.Json.Serialization;
 
@@ -19,7 +21,7 @@ builder.Services.Configure<JsonOptions>(options =>
 
 builder.Services.AddDbContext<MyBoardsContext>(
     option => option
-    .UseLazyLoadingProxies()
+    //.UseLazyLoadingProxies()
     .UseSqlServer(builder.Configuration.GetConnectionString("MyBoardsConnectionString"))
     
     );
@@ -71,24 +73,55 @@ if (!users.Any())
 
 //Metoda GetPendingMigrations() jest czêœci¹ API migracji Entity Framework Core. S³u¿y do uzyskania listy migracji, //które zosta³y utworzone, ale jeszcze nie zosta³y zastosowane w bazie danych.
 
-app.MapGet("data",async (MyBoardsContext db) =>
+app.MapGet("pagination", async (MyBoardsContext db) =>
 {
+    //user input
+    var filter = "a";
+    string sortBy = "FullName"; //fullname,email,null ?
+    bool sortByDescending = false;
+    int pageNumber = 1;
+    int pageSize = 10;
+    //
 
-    var withAddress = true;
+    var query = db.Users
+    .Where(u => filter == null || (u.Email.Contains(filter.ToLower()) || u.FullName.Contains(filter.ToLower())));
 
-    var users = db.Users
-    
-    .First(u => u.Id == Guid.Parse("78CF834E-7724-4995-CBC4-08DA10AB0E61"));
+    var totalCount = query.Count();
 
-    if (withAddress)
+    if(sortBy != null)
     {
-        var result = new { Fullname = users.FullName, Address = $"{users.Address.Street} {users.Address.City}" };
-        return result;
+        var columnsSelector = new Dictionary<string, Expression<Func<User, object>>>
+        {
+
+            {nameof(User.Email),user => user.Email},
+            {nameof(User.FullName),user => user.FullName},
+        };
+
+        var sortByExpression = columnsSelector[sortBy];
+
+        query = sortByDescending 
+        ? query.OrderByDescending(sortByExpression) 
+        : query.OrderBy(sortByExpression);
+
+
+
     }
 
-    return new {FullName = users.FullName, Address = "-"};
+    var result = query.Skip(pageSize * (pageSize - 1))
+    .Take(pageSize)
+    .ToList();
+
+    var pagedResult = new PagedResult<User>(result,totalCount,pageSize,pageNumber);
+
+    return pagedResult;
+
+});
+    
 
 
+app.MapGet("data",async (MyBoardsContext db) =>
+{
+  
 });
 
 app.MapPost("update", async (MyBoardsContext db) =>
