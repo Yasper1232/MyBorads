@@ -1,8 +1,11 @@
+using LinqToDB.EntityFrameworkCore;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
+using MyBorads;
 using MyBorads.Dto;
 using MyBorads.Entities;
+using MyBorads.Migrations;
 using System.Diagnostics.Metrics;
 using System.IO;
 using System.Linq.Expressions;
@@ -43,6 +46,8 @@ if (pendingMigrations.Any())
 {
     dbContext.Database.Migrate();
 }
+
+DataGenerator.Seed(dbContext);
 
 var users = dbContext.Users.ToList();
 if (!users.Any())
@@ -121,7 +126,18 @@ app.MapGet("pagination", async (MyBoardsContext db) =>
 
 app.MapGet("data",async (MyBoardsContext db) =>
 {
-  
+
+    var usercomments = await db.Users
+    .Include(u => u.Address)
+    .Include(u => u.Comments)
+    .Where(u => u.Address.Country == "Albania")
+    .SelectMany(u=>u.Comments)
+    .Select(c=>c.Message)
+    .ToListAsync();
+
+
+    return usercomments;
+
 });
 
 app.MapPost("update", async (MyBoardsContext db) =>
@@ -137,6 +153,19 @@ app.MapPost("update", async (MyBoardsContext db) =>
     return epic;
 
 });
+
+app.MapPut("updateLinq2Db", async (MyBoardsContext db) =>
+{
+
+    var comments = db.Comments
+    .Where(c => c.CreatedDate > new DateTime(2022, 4, 20));
+
+    await LinqToDB.LinqExtensions.UpdateAsync(comments.ToLinqToDB(), x => new Comment
+    {
+        Message = "Great comment"
+    });
+});
+
 
 app.MapPost("create", async (MyBoardsContext db) =>
 {
